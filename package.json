@@ -1,0 +1,24 @@
+{
+  "name": "unipimart",
+  "version": "0.0.1",
+  "description": "Eshop to practice secure programming",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fanixk/unipimart.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fanixk/unipimart/issues"
+  },
+  "homepage": "https://github.com/fanixk/unipimart",
+  "devDependencies": {
+    "body-parser": "^1.12.2",
+    "express": "^4.12.3",
+    "express-force-ssl": "^0.2.11"
+  }
+}
