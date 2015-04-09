@@ -1,17 +1,64 @@
-<!DOCTYPE html>
-<html ng-app="unipimart">
-<head>
-<title>UnipiMart</title>
-</head>
+<!doctype html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <title>Unipimart</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="components/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="styles/main.css">
+  </head>
+  <body ng-app="unipimart">
+    <div class="header">
+      <div class="navbar navbar-inverse" role="navigation">
+        <div class="container">
+          <div class="navbar-header">
 
-<body ng-controller="MainCtrl">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#js-navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
 
-<ul>
-  <li ng-repeat="product in data.products">{{product.title}}</li>
-</ul>
-<script src="components/angular/angular.min.js"></script>
-<script src="app.js"></script>
+            <a class="navbar-brand" href="#/">Unipimart</a>
+          </div>
 
+          <div class="collapse navbar-collapse" id="js-navbar-collapse">
+
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#/">Home</a></li>
+              <li><a ng-href="#/login">Login</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div id="loaderDiv" ng-show="loader">
+        <img src="images/ajax-loader.gif" class="ajax-loader"/>
+      </div>
+
+      <div ng-view=""></div>
+
+    </div>
+
+    <div class="footer">
+      <div class="container">
+        <p><!-- <span class="glyphicon glyphicon-heart"></span> --> from fanixk</p>
+      </div>
+    </div>
+    
+    <script src="components/jquery/dist/jquery.min.js"></script>
+    <script src="components/angular/angular.min.js"></script>
+    <script src="components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="components/angular-route/angular-route.min.js"></script>
+    <script src="components/angular-sanitize/angular-sanitize.min.js"></script>
+
+    <script src="app/app.js"></script>
+    <script src="app/controllers/MainCtrl.js"></script>
+    <script src="app/controllers/LoginCtrl.js"></script>
+    <!-- <script src="app/services/twitterservice.js"></script> -->
 </body>
-
 </html>

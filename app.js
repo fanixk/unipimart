@@ -49,7 +49,11 @@ app.use(function(err, req, res, next) {
       break;
     case 'BadRequestError':
       code = err.status;
-      msg = err.inner;     
+      msg = err.inner; 
+      break;
+    default:              //for debugging purposes only (Remove me!)
+      code = err.status;
+      msg = err.inner;    
   }
 
   res.status(code).json(msg);
