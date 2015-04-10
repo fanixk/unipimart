@@ -1,19 +1,20 @@
 'use strict'
 
 angular.module('unipimart')
-  .controller('LoginCtrl', function($scope, $http, $window, $location) {
+  .controller('LoginCtrl', function($scope, $http, $window, $location, userService, authService) {
+    $scope.login = function() {
+      userService.login($scope.user)
+        .success(function(data) {
+          authService.isAuthed = true;
+          authService.user = data.email;
 
-    $scope.submit = function() {
-      $http.post('/api/login', $scope.user)
-        .success(function(data, status, headers, config) {
           $window.sessionStorage.token = data.token;
-          $location.path('/');
-        })
-        .error(function(data, status, headers, config) {
-          // Erase the token if the user fails to log in
-          delete $window.sessionStorage.token;
+          $window.sessionStorage.user = data.email; // to fetch the user details on refresh
 
-          // Handle login errors here
+          $location.path("/");
+
+        }).error(function(status, data) {
+          console.log(status, data);
         });
     };
   });

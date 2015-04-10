@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="styles/main.css">
   </head>
   <body ng-app="unipimart">
-    <div class="header">
+    <div class="header" ng-controller="RootCtrl">
       <div class="navbar navbar-inverse" role="navigation">
         <div class="container">
           <div class="navbar-header">
@@ -27,8 +27,12 @@
           <div class="collapse navbar-collapse" id="js-navbar-collapse">
 
             <ul class="nav navbar-nav">
-              <li class="active"><a href="#/">Home</a></li>
-              <li><a ng-href="#/login">Login</a></li>
+              <li ng-class="{active:isActive('/')}"><a href="#/">Home</a></li>
+              <li ng-class="{active:isActive('/login')}" ng-show="!authService.isAuthed"><a ng-href="#/login">Login</a></li>
+
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li ng-show="authService.isAuthed"><a ng-click="logout()">Logout</a></li>
             </ul>
           </div>
         </div>
@@ -46,7 +50,7 @@
 
     <div class="footer">
       <div class="container">
-        <p><!-- <span class="glyphicon glyphicon-heart"></span> --> from fanixk</p>
+        <p>from fanixk</p>
       </div>
     </div>
     
@@ -59,6 +63,8 @@
     <script src="app/app.js"></script>
     <script src="app/controllers/MainCtrl.js"></script>
     <script src="app/controllers/LoginCtrl.js"></script>
-    <!-- <script src="app/services/twitterservice.js"></script> -->
+    <script src="app/controllers/RootCtrl.js"></script>
+    <script src="app/services/userService.js"></script>
+    <script src="app/services/authService.js"></script>
 </body>
 </html>

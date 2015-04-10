@@ -35,8 +35,7 @@ app.all('*', function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
-  var code = 500,
-    msg = { message: "Internal Server Error" }; //default http 500
+  var code, msg; //default http 500
 
   switch(err.name) {
     case 'UnauthorizedError':
@@ -51,9 +50,11 @@ app.use(function(err, req, res, next) {
       code = err.status;
       msg = err.inner; 
       break;
-    default:              //for debugging purposes only (Remove me!)
-      code = err.status;
-      msg = err.inner;    
+    default:              
+      // code = 500
+      // msg = { message: "Internal Server Error" }; //default http 500
+      code = err.status; //for debugging purposes only (Remove me!)
+      msg = err.inner;   //
   }
 
   res.status(code).json(msg);

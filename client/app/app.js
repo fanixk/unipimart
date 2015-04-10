@@ -26,7 +26,7 @@ angular
     $httpProvider.interceptors.push('authInterceptor');
   });
 
-function auth_interceptor($rootScope, $q, $window) {
+function auth_interceptor($rootScope, $q, $window, authService, $location) {
   return {
     request: function(config) {
       config.headers = config.headers || {};
@@ -36,10 +36,19 @@ function auth_interceptor($rootScope, $q, $window) {
       return config;
     },
     response: function(response) {
-      if (response.status === 401) {
-        // handle the case where the user is not authenticated
+      if (response && response.status === 200 && $window.sessionStorage.token && !authService.isAuthed) {
+        authService.isAuthed = true;
       }
       return response || $q.when(response);
+    },
+    responseError: function(response) {
+      if (response && response.status === 401 && ($window.sessionStorage.token || authService.isAuthed)) {
+        delete $window.sessionStorage.token;
+        authService.isAuthed = false;
+        $location.path("/login");
+      }
+
+      return $q.reject(response);
     }
   };
 }

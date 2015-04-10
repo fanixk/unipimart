@@ -23,10 +23,13 @@ var User = db.define('user', {
   timestamps: false,
   hooks: {
     beforeCreate: function(user, options, cb) {
+      // bcrypt user pass
       bcrypt.hash(user.password, 10, function(err, hash) {
         if(err) {
           cb(new Error("Account couldn't be registered."));
         }
+
+        //set the hash to the user password
         user.password = hash;
         cb(null, user);
       });
@@ -56,19 +59,27 @@ module.exports = {
       return respondInvalidUser(res);
     }
 
-    User.findOne({ where: { email: email }})
-      .then(function(user) {
-        bcrypt.compare(password, user.password, function(err, isMatch) {
-          if (err || !isMatch) {
-            return respondInvalidUser(res);
-          }
+    // find user by email
+    User.findOne({ where: { email: email }}).then(function(user) {
+      // user does not exist
+      if (!user) {
+        return respondInvalidUser(res);
+      }
 
-          var token = generateToken(user);
-          return res.json({
-            email: email,
-            token: token
-          });
+      // compare hashed passwords
+      bcrypt.compare(password, user.password, function(err, isMatch) {
+        // on error or not matched hashed pwds
+        if (err || !isMatch) {
+          return respondInvalidUser(res);
+        }
+
+        // send generated token on valid auth
+        var token = generateToken(user);
+        return res.json({
+          email: email,
+          token: token
         });
+      });
     });
   },
   register: function(req, res) {
@@ -103,6 +114,9 @@ module.exports = {
     // xss sanitize
     email = sanitizer.sanitize(email);
 
+    // find user by email
+    // create user if he does not exist
+    // return generated token
     User.findOrCreate({
       where: {
         email: email
