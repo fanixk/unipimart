@@ -12,7 +12,7 @@ var mockedUser = {
 };
 
 function respondInvalidUser(res) {
-  res.status(404)
+  res.status(401)
     .json({
       "message": "Invalid email and/or password."
     });

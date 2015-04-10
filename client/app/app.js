@@ -24,7 +24,6 @@ angular
   .config(function($httpProvider) {
     $httpProvider.interceptors.push('httpInterceptor');
     $httpProvider.interceptors.push('authInterceptor');
-
   });
 
 function auth_interceptor($rootScope, $q, $window) {
