@@ -2,16 +2,10 @@ var _ = require('lodash'),
   Sequelize = require('sequelize'),
   jwt = require('jsonwebtoken'),
   bcrypt = require('bcrypt'),
+  sanitizer = require('sanitizer'),
   db = require('../config/db.js'),
   config = require('../config/env.json'),
   TOKEN_EXPIRATION = 60;
-
-
-var mockedUser = {
-  id: 1,
-  email: 'test@test.com',
-  password: '123'
-};
 
 var User = db.define('user', {
   id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
@@ -68,10 +62,12 @@ module.exports = {
           if (err || !isMatch) {
             return respondInvalidUser(res);
           }
+
           var token = generateToken(user);
           return res.json({
+            email: email,
             token: token
-          })
+          });
         });
     });
   },
@@ -104,6 +100,9 @@ module.exports = {
       });
     }
 
+    // xss sanitize
+    email = sanitizer.sanitize(email);
+
     User.findOrCreate({
       where: {
         email: email
@@ -119,7 +118,7 @@ module.exports = {
         });
       }
 
-      res.json({ token: generateToken(user.id) });
+      res.json({ email: email, token: generateToken(user.id) });
     });
   }
 }

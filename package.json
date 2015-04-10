@@ -27,6 +27,7 @@
     "jsonwebtoken": "^4.2.2",
     "lodash": "^3.6.0",
     "mysql": "^2.6.1",
+    "sanitizer": "^0.1.2",
     "sequelize": "^2.0.5"
   }
 }
