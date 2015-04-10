@@ -22,13 +22,13 @@ var User = db.define('user', {
 }, {
   timestamps: false,
   hooks: {
-    beforeCreate: function(user, options, fn) {
+    beforeCreate: function(user, options, cb) {
       bcrypt.hash(user.password, 10, function(err, hash) {
         if(err) {
-          fn(new Error('Account couldn\'t be registered.'));
+          cb(new Error("Account couldn't be registered."));
         }
         user.password = hash;
-        fn(null, user);
+        cb(null, user);
       });
     }
   }
@@ -96,7 +96,7 @@ module.exports = {
 
     if (password_confirmation !== password) {
       return res.json({
-        message: 'Passwords don\'t match'
+        message: "Passwords don't match"
       });
     }
 
