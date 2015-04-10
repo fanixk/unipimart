@@ -1,4 +1,5 @@
-var config = require('./database.json'),
+var Sequelize = require('sequelize'),
+  config = require('./database.json'),
   env = process.env.NODE_ENV || 'development',
   host = config[env].host,
   driver = config[env].driver,
@@ -8,7 +9,8 @@ var config = require('./database.json'),
 
 var sequelize = new Sequelize(db, dbUsername, dbPass, {
   host: host,
-  dialect: driver
+  dialect: driver,
+  logging: false
 });
 
 module.exports = sequelize;

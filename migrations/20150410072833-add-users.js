@@ -6,8 +6,7 @@ exports.up = function(db, callback) {
     id: {
       type: 'int',
       primaryKey: true,
-      unsigned: true,
-      notNull: true
+      autoIncrement: true
     },
     email: {
       type: 'string',
@@ -16,8 +15,8 @@ exports.up = function(db, callback) {
       unique: true
     },
     password_digest: {
-      type: 'binary',
-      length: 60,
+      type: 'string',
+      length: 255,
       notNull: true
     },
   }, callback);

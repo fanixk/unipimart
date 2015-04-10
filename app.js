@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 // Auth Middleware
 // routes starting with /api will be checked for jwt token (except /api/login)
 // app.all('/api/*', [require('./server/middlewares/authRequest')]);
-app.use('/api/*', jwtMiddleware({ secret: config.jwtSecret}).unless({path: ['/api/login']}));
+app.use('/api/*', jwtMiddleware({ secret: config.jwtSecret}).unless({path: ['/api/login', '/api/register']}));
 
 app.use(routes);
 

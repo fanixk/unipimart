@@ -4,6 +4,7 @@ var express = require('express'),
   user = require('../models/user.js');
 
 router.post('/api/login', user.login);
+router.post('/api/register', user.register);
 router.get('/api/catalog', product.list);
 
 module.exports = router;
