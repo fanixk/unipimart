@@ -66,7 +66,7 @@ function validateRegister(email, password, password_confirmation) {
 
   if (password && password_confirmation && (password_confirmation !== password)) {
     isValid = false;
-    errors.push('Passwords don\'t match');
+    errors.push('Passwords don\'t match.');
   }
 
   // RFCs 5321, 5322 compliant
@@ -84,7 +84,7 @@ function validateRegister(email, password, password_confirmation) {
 function respondInvalidUser(res) {
   res.status(401)
     .json({
-      "errorMsg": "Invalid email and/or password."
+      errorMsg: 'Invalid email and/or password.'
     });
 }
 
@@ -96,7 +96,7 @@ function generateToken(user) {
 }
 
 module.exports = {
-  login: function(req, res, next) {
+  login: function(req, res) {
 
     var email = req.body.email || '',
       password = req.body.password || '';
@@ -160,7 +160,7 @@ module.exports = {
     .spread(function(user, created) {
       if(!created) {
         return res.json({
-          message: 'Account with that email already exists.'
+          errorMsg: 'Account with that email already exists.'
         });
       }
 

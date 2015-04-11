@@ -15,11 +15,11 @@ angular.module('unipimart')
           $location.path('/login');
         }
       },
-      register: function(email, password, password_confirmation) {
+      register: function(user) {
         return $http.post('/api/register', {
-          email: email,
-          password: password,
-          password_confirmation: password_confirmation
+          email: user.email,
+          password: user.password,
+          password_confirmation: user.password_confirmation
         });
       }
     };

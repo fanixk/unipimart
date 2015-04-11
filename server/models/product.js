@@ -17,13 +17,13 @@ module.exports = {
     if (_.isEmpty(title)) {
       res.status(400)
         .json({
-          "msg": "No title parameter found"
+          msg: 'No title parameter found'
         });
       return;
     }
 
     var results = products.filter(function(product) {
-      return product.title == title;
+      return product.title === title;
     });
 
     res.json(results);
