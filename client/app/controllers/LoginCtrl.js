@@ -2,6 +2,9 @@
 
 angular.module('unipimart')
   .controller('LoginCtrl', function($scope, $http, $window, $location, userService, authService) {
+    $scope.data = $scope.data || {};
+    authService.checkAndRedirect();
+    
     $scope.login = function() {
       userService.login($scope.user)
         .success(function(data) {
@@ -13,8 +16,8 @@ angular.module('unipimart')
 
           $location.path('/');
 
-        }).error(function(status, data) {
-          console.log(status, data);
+        }).error(function(data, status) {
+          $scope.data.errorMsg = data.errorMsg;
         });
     };
   });

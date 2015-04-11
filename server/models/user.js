@@ -43,7 +43,7 @@ var User = db.define('user', {
 function respondInvalidUser(res) {
   res.status(401)
     .json({
-      "message": "Invalid email and/or password."
+      "errorMsg": "Invalid email and/or password."
     });
 }
 

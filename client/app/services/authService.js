@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('unipimart')
-  .factory('authService', function($window) {
+  .factory('authService', function($window, $location) {
     var auth = {
       isAuthed: false,
       check: function() {
@@ -10,6 +10,11 @@ angular.module('unipimart')
         } else {
           this.isAuthed = false;
           delete this.user;
+        }
+      },
+      checkAndRedirect: function() {
+        if(this.isAuthed){
+          $location.path('/');
         }
       }
     };
