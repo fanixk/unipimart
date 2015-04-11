@@ -1,17 +1,80 @@
-<!DOCTYPE html>
-<html ng-app="unipimart">
-<head>
-<title>UnipiMart</title>
-</head>
+<!doctype html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <title>Unipimart</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="components/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="styles/main.css">
+  </head>
+  <body ng-app="unipimart">
+    <div class="header" ng-controller="RootCtrl">
+      <div class="navbar navbar-inverse" role="navigation">
+          <div class="navbar-header">
 
-<body ng-controller="MainCtrl">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#js-navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
 
-<ul>
-  <li ng-repeat="product in data.products">{{product.title}}</li>
-</ul>
-<script src="components/angular/angular.min.js"></script>
-<script src="app.js"></script>
+            <a class="navbar-brand" href="#/">Unipimart</a>
+          </div>
 
+          <div class="collapse navbar-collapse" id="js-navbar-collapse">
+
+            <ul class="nav navbar-nav">
+              <li ng-class="{active:isActive('/')}"><a href="#/">Catalog</a></li>
+              <li ng-class="{active:isActive('/login')}" ng-show="!authService.isAuthed"><a ng-href="#/login">Login</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right" ng-show="authService.isAuthed">
+              <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                  <span class="glyphicon glyphicon-user" aria-hidden="true">
+                    {{authService.user}}
+                  </span>
+                  <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" role="menu">
+                  <li ng-show="authService.isAuthed">
+                    <a href="#/" ng-click="logout()">
+                      <span class="glyphicon glyphicon-off" aria-hidden="true"> Logout</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div id="loaderDiv" ng-show="loader">
+        <img src="images/ajax-loader.gif" class="ajax-loader"/>
+      </div>
+
+      <div ng-view=""></div>
+
+    </div>
+
+    <div class="footer">
+    </div>
+    
+    <script src="components/jquery/dist/jquery.min.js"></script>
+    <script src="components/angular/angular.min.js"></script>
+    <script src="components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="components/angular-route/angular-route.min.js"></script>
+    <script src="components/angular-sanitize/angular-sanitize.min.js"></script>
+
+    <script src="app/app.js"></script>
+    <script src="app/controllers/RootCtrl.js"></script>
+    <script src="app/controllers/MainCtrl.js"></script>
+    <script src="app/controllers/LoginCtrl.js"></script>
+    <script src="app/controllers/RegisterCtrl.js"></script>
+
+    <script src="app/services/userService.js"></script>
+    <script src="app/services/authService.js"></script>
 </body>
-
 </html>

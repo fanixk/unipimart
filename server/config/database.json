@@ -1,0 +1,9 @@
+{
+  "development": {
+    "driver": "mysql",
+    "host": "localhost",
+    "database": "unipimart",
+    "user": "root",
+    "password": ""
+  }
+}
