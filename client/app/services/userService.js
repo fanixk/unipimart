@@ -11,12 +11,7 @@ angular.module('unipimart')
       },
       logout: function() {
         if (authService.isAuthed) {
-          authService.isAuthed = false;
-          delete authService.user;
-
-          delete $window.sessionStorage.token;
-          delete $window.sessionStorage.user;
-
+          authService.clearAuthedStatus();
           $location.path('/login');
         }
       },

@@ -38,7 +38,11 @@
                   <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu" role="menu">
-                  <li ng-show="authService.isAuthed"><a href="#/" ng-click="logout()">Logout</a></li>
+                  <li ng-show="authService.isAuthed">
+                    <a href="#/" ng-click="logout()">
+                      <span class="glyphicon glyphicon-off" aria-hidden="true"> Logout</span>
+                    </a>
+                  </li>
                 </ul>
               </li>
             </ul>
