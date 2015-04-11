@@ -40,18 +40,6 @@ var User = db.define('user', {
   }
 });
 
-function respondInvalidUser(res) {
-  res.status(401)
-    .json({
-      "errorMsg": "Invalid email and/or password."
-    });
-}
-
-function generateToken(user) {
-  var token = jwt.sign({ id: user.id }, config.jwtSecret, { expiresInMinutes: TOKEN_EXPIRATION });
-  return token;
-}
-
 function validateRegister(email, password, password_confirmation) {
   var errors = [],
     isValid = true;
@@ -91,6 +79,20 @@ function validateRegister(email, password, password_confirmation) {
     isValid: isValid,
     errors: errors
   };
+}
+
+function respondInvalidUser(res) {
+  res.status(401)
+    .json({
+      "errorMsg": "Invalid email and/or password."
+    });
+}
+
+function generateToken(user) {
+  // payload is the user object except the password
+  var payload = _.omit(user.toJSON(), 'password');
+  var token = jwt.sign(payload, config.jwtSecret, { expiresInMinutes: TOKEN_EXPIRATION });
+  return token;
 }
 
 module.exports = {
@@ -162,7 +164,7 @@ module.exports = {
         });
       }
 
-      res.json({ email: email, token: generateToken(user.id) });
+      res.json({ email: email, token: generateToken(user) });
     });
   }
 }

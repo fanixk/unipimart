@@ -19,6 +19,7 @@ var app = express();
 
 app.use(forceSSL);
 app.use(express.static(__dirname + '/client'));
+// only accepts content-type application/json
 app.use(bodyParser.json());
 
 // Auth Middleware
@@ -37,24 +38,24 @@ app.all('*', function(req, res, next) {
 app.use(function(err, req, res, next) {
   var code, msg; //default http 500
 
-  switch(err.name) {
-    case 'UnauthorizedError':
-      code = err.status;
-      msg = { message: 'Unauthorized' };
-      break;
-    case 'NotFoundError':
-      code = err.status;
-      msg = { message: 'Not Found' };
-      break;
-    case 'BadRequestError':
-      code = err.status;
-      msg = err.inner; 
-      break;
-    default:              
-      // code = 500
-      // msg = { message: "Internal Server Error" }; //default http 500
-      code = err.status; //for debugging purposes only (Remove me!)
-      msg = err.inner;   //
+  switch (err.name) {
+  case 'UnauthorizedError':
+    code = err.status;
+    msg = { message: 'Unauthorized' };
+    break;
+  case 'NotFoundError':
+    code = err.status;
+    msg = { message: 'Not Found' };
+    break;
+  case 'BadRequestError':
+    code = err.status;
+    msg = err.inner;
+    break;
+  default:
+    // code = 500
+    // msg = { message: "Internal Server Error" }; //default http 500
+    code = err.status; //for debugging purposes only (Remove me!)
+    msg = err.inner;   //
   }
 
   res.status(code).json(msg);
