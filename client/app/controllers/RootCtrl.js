@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 angular.module('unipimart')
   .controller('RootCtrl', function($scope, $location, userService, authService) {

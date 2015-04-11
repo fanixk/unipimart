@@ -38,6 +38,7 @@ function auth_interceptor($rootScope, $q, $window, authService, $location) {
     response: function(response) {
       if (response && response.status === 200 && $window.sessionStorage.token && !authService.isAuthed) {
         authService.isAuthed = true;
+        authService.user = $window.sessionStorage.user;
       }
       return response || $q.when(response);
     },
@@ -45,7 +46,8 @@ function auth_interceptor($rootScope, $q, $window, authService, $location) {
       if (response && response.status === 401 && ($window.sessionStorage.token || authService.isAuthed)) {
         delete $window.sessionStorage.token;
         authService.isAuthed = false;
-        $location.path("/login");
+        delete authService.user;
+        $location.path('/login');
       }
 
       return $q.reject(response);

@@ -1,3 +1,5 @@
+'use strict';
+
 angular.module('unipimart')
   .factory('userService', function($window, $location, $http, authService) {
     return {
@@ -15,7 +17,7 @@ angular.module('unipimart')
           delete $window.sessionStorage.token;
           delete $window.sessionStorage.user;
 
-          $location.path("/login");
+          $location.path('/login');
         }
       },
       register: function(email, password, password_confirmation) {
@@ -25,5 +27,5 @@ angular.module('unipimart')
           password_confirmation: password_confirmation
         });
       }
-    }
+    };
   });

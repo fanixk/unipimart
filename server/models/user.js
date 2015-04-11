@@ -1,8 +1,11 @@
+'use strict';
+
 var _ = require('lodash'),
   Sequelize = require('sequelize'),
   jwt = require('jsonwebtoken'),
   bcrypt = require('bcrypt'),
   sanitizer = require('sanitizer'),
+  isEmail = require('isemail'),
   db = require('../config/db.js'),
   config = require('../config/env.json'),
   TOKEN_EXPIRATION = 60;
@@ -49,11 +52,52 @@ function generateToken(user) {
   return token;
 }
 
+function validateRegister(email, password, password_confirmation) {
+  var errors = [],
+    isValid = true;
+
+  if (_.isEmpty(email)) {
+    isValid = false;
+    errors.push('Missing email.');
+  }
+
+  if (_.isEmpty(password)) {
+    isValid = false;
+    errors.push('Missing password.');
+  }
+
+  if (_.isEmpty(password_confirmation)) {
+    isValid = false;
+    errors.push('Missing password confirmation.');
+  }
+
+  if (password && password.length < 8) {
+    isValid = false;
+    errors.push('Password should be at least 8 characters long.');
+  }
+
+  if (password && password_confirmation && (password_confirmation !== password)) {
+    isValid = false;
+    errors.push('Passwords don\'t match');
+  }
+
+  // RFCs 5321, 5322 compliant
+  if (email && !isEmail(email)) {
+    isValid = false;
+    errors.push('Not a valid email address.');
+  }
+
+  return {
+    isValid: isValid,
+    errors: errors
+  };
+}
+
 module.exports = {
   login: function(req, res, next) {
 
-    var email = req.body.email,
-      password = req.body.password;
+    var email = req.body.email || '',
+      password = req.body.password || '';
 
     if(_.isEmpty(email) || _.isEmpty(password)) {
       return respondInvalidUser(res);
@@ -83,36 +127,22 @@ module.exports = {
     });
   },
   register: function(req, res) {
-    var email = req.body.email,
-      password = req.body.password,
-      password_confirmation = req.body.password_confirmation;
-
-    if (_.isEmpty(email)) {
-      return res.json({
-          message: 'Missing email.'
-        });
-    }
-
-    if (_.isEmpty(password)) {
-      return res.json({
-        message: 'Missing password.'
-      });
-    }
-
-    if (password.length < 8) {
-      return res.json({
-        message: 'Password should be at least 8 characters long'
-      });
-    }
-
-    if (password_confirmation !== password) {
-      return res.json({
-        message: "Passwords don't match"
-      });
-    }
+    var email = req.body.email || '',
+      password = req.body.password || '',
+      password_confirmation = req.body.password_confirmation || '';
 
     // xss sanitize
+    // even valid email addresses can be used for xss attacks
     email = sanitizer.sanitize(email);
+
+    var validator = validateRegister(email, password, password_confirmation);
+    
+    if (!validator.isValid) {
+      return res.status(400)
+        .json({
+          errors: validator.errors
+        });
+    }
 
     // find user by email
     // create user if he does not exist
@@ -126,7 +156,7 @@ module.exports = {
       }
     })
     .spread(function(user, created) {
-      if(!created) { 
+      if(!created) {
         return res.json({
           message: 'Account with that email already exists.'
         });

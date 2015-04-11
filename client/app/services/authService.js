@@ -1,3 +1,5 @@
+'use strict';
+
 angular.module('unipimart')
   .factory('authService', function($window) {
     var auth = {
@@ -10,7 +12,7 @@ angular.module('unipimart')
           delete this.user;
         }
       }
-    }
+    };
 
     return auth;
   });

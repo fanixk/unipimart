@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 angular.module('unipimart')
   .controller('LoginCtrl', function($scope, $http, $window, $location, userService, authService) {
@@ -11,7 +11,7 @@ angular.module('unipimart')
           $window.sessionStorage.token = data.token;
           $window.sessionStorage.user = data.email; // to fetch the user details on refresh
 
-          $location.path("/");
+          $location.path('/');
 
         }).error(function(status, data) {
           console.log(status, data);
