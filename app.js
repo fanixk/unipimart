@@ -18,8 +18,10 @@ var credentials = {
 
 var app = express();
 
+// Force use of https
 app.use(forceSSL);
 
+// Content Security Policy Header
 // default Content security policy is to allow content loading only from same origin
 // defaultSrc applies as a fallback to all sources not defined
 app.use(helmet.csp({
@@ -34,15 +36,40 @@ app.use(helmet.csp({
   // frameSrc: []
 }));
 
+// Add X-XSS-Protection header
+// X-XSS-Protection: 1; mode=block
+// http://blogs.msdn.com/b/ie/archive/2008/07/02/ie8-security-part-iv-the-xss-filter.aspx
+app.use(helmet.xssFilter());
+
+// Implement header X-Frame-Options: Deny
+// Deny - Does not allow your page to be served inside any frames.
+// Prevents clickjacking attacks
+app.use(helmet.frameguard('deny'));
+
+// Implement header Strict-Transport-Security
+// Response header -> Strict-Transport-Security: max-age=7776000; includeSubDomains
+// HTTP Strict-Transport-Security (HSTS) enforces secure (HTTP over SSL/TLS) connections to the server. 
+// This reduces impact of bugs in web applications leaking session data through cookies and external links 
+// and defends against Man-in-the-middle attacks. 
+// HSTS also disables the ability for user's to ignore SSL negotiation warnings.
+// It basically tells user agents to interact with it in the future only over HTTPS.
+app.use(helmet.hsts({
+  maxAge: 7776000000,     // 90 days
+  includeSubdomains: true
+}));
+
+// Hide X-Powered-By header
+app.use(helmet.hidePoweredBy());
+
 app.use(express.static(__dirname + '/client'));
 // only accepts content-type application/json
 app.use(bodyParser.json());
 
 // Auth Middleware
-// routes starting with /api will be checked for jwt token (except /api/login)
-// app.all('/api/*', [require('./server/middlewares/authRequest')]);
+// routes starting with /api will be checked for jwt token (except /api/login && /api/register)
 app.use('/api/*', jwtMiddleware({ secret: config.jwtSecret}).unless({path: ['/api/login', '/api/register']}));
 
+// Define routes
 app.use(routes);
 
 //return 404 on not matched routes
