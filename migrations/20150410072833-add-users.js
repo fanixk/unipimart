@@ -16,7 +16,7 @@ exports.up = function(db, callback) {
     },
     password_digest: {
       type: 'string',
-      length: 255,
+      length: 60,
       notNull: true
     },
   }, callback);

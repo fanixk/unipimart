@@ -22,22 +22,15 @@ var TOKEN_EXPIRATION = 60,
 
 var User = db.define('user', {
   id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
-  email: {
-    type: Sequelize.STRING,
-    allowNull: false,
-    unique: true
-  },
-  password: {
-    type: Sequelize.STRING,
-    allowNull: false,
-    field: 'password_digest' // Will result in an attribute that is password when user facing but password_digest in the database
-  }
+  email: { type: Sequelize.STRING, allowNull: false, unique: true },
+  // Will result in an attribute that is password when user facing but password_digest in the database
+  password: { type: Sequelize.STRING, allowNull: false, field: 'password_digest'}
 }, {
   timestamps: false,
   hooks: {
     // hash the password before saving it in db
     beforeCreate: function(user, options, cb) {
-      // bcrypt user pass
+      // bcrypt user pass (2^10 rounds to generate a secure 128bit salt)
       bcrypt.hash(user.password, 10, function(err, hash) {
         if(err) {
           cb(new Error(ACCOUNT_CREATE_ERROR));
