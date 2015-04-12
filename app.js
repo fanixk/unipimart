@@ -6,6 +6,7 @@ var express = require('express'),
   http = require('http'),
   https = require('https'),
   jwtMiddleware = require('express-jwt'),
+  helmet = require('helmet'),
   routes = require('./server/routes'),
   config = require('./server/config/env.json'),
   notFoundError = require('./server/errors/notFoundError');
@@ -18,6 +19,21 @@ var credentials = {
 var app = express();
 
 app.use(forceSSL);
+
+// default Content security policy is to allow content loading only from same origin
+// defaultSrc applies as a fallback to all sources not defined
+app.use(helmet.csp({
+  defaultSrc: ["'self'"],
+  // scriptSrc: [],
+  styleSrc: ["'self'", "'unsafe-inline'"], // permit inline css
+  // imgSrc: [],
+  // connectSrc: [],                      // ajax, web sockets
+  // fontSrc: [],
+  // objectSrc: [],                       // object, embed, applet
+  // mediaSrc: [],                        // audio, video
+  // frameSrc: []
+}));
+
 app.use(express.static(__dirname + '/client'));
 // only accepts content-type application/json
 app.use(bodyParser.json());
@@ -52,10 +68,8 @@ app.use(function(err, req, res, next) {
     msg = err.inner;
     break;
   default:
-    // code = 500
-    // msg = { message: "Internal Server Error" }; //default http 500
-    code = err.status; //for debugging purposes only (Remove me!)
-    msg = err.inner;   //
+    code = 500;
+    msg = { message: 'Internal Server Error' }; //default http 500
   }
 
   res.status(code).json(msg);
