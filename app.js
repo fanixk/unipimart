@@ -46,7 +46,7 @@ app.use(helmet.xssFilter());
 // Prevents clickjacking attacks
 app.use(helmet.frameguard('deny'));
 
-// Implement header Strict-Transport-Security
+// Implement Strict-Transport-Security header
 // Response header -> Strict-Transport-Security: max-age=7776000; includeSubDomains
 // HTTP Strict-Transport-Security (HSTS) enforces secure (HTTP over SSL/TLS) connections to the server. 
 // This reduces impact of bugs in web applications leaking session data through cookies and external links 
@@ -84,11 +84,11 @@ app.use(function(err, req, res, next) {
   switch (err.name) {
   case 'UnauthorizedError':
     code = err.status;
-    msg = { message: 'Unauthorized' };
+    msg = { errorMsg: 'Unauthorized' };
     break;
   case 'NotFoundError':
     code = err.status;
-    msg = { message: 'Not Found' };
+    msg = { errorMsg: 'Not Found' };
     break;
   case 'BadRequestError':
     code = err.status;
@@ -96,7 +96,7 @@ app.use(function(err, req, res, next) {
     break;
   default:
     code = 500;
-    msg = { message: 'Internal Server Error' }; //default http 500
+    msg = { errorMsg: 'Internal Server Error' }; //default http 500
   }
 
   res.status(code).json(msg);
