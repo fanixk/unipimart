@@ -1,17 +1,23 @@
 'use strict'
 
 angular.module('unipimart')
-  .controller('MainCtrl', function($scope, $http, $window, $location) {
+  .controller('MainCtrl', function($scope, $http, $window, cartService) {
     $scope.data = $scope.data || {};
-
-    //if not isLoggedIn (move to service)
-    if(!$window.sessionStorage.token) {
-      $location.path('/login');
-      return;
-    }
 
     $http.get("/api/catalog")
       .success(function(data) {
         $scope.data.products = data;
       });
+
+    $scope.data.cart = function() {
+      return cartService.getProducts();
+    }
+
+    $scope.addProduct = function(id) {
+      cartService.addProduct(id);
+    }
+
+    $scope.removeProduct = function(id) {
+      cartService.removeProduct(id);
+    }
   });

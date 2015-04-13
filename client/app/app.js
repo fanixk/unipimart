@@ -48,8 +48,11 @@ function auth_interceptor($rootScope, $q, $window, authService, $location) {
       return response || $q.when(response);
     },
     responseError: function(response) {
+      // token expiration
       if (response && response.status === 401 && ($window.sessionStorage.token || authService.isAuthed)) {
         authService.clearAuthedStatus();
+        $location.path('/login');
+      } else if (response && response.status === 401) {  // requiredLogin
         $location.path('/login');
       }
 
