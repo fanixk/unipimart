@@ -1,14 +1,37 @@
 <div class="container-fluid">
   <div class="row">
+
     <div class="col-md-8">
-      <ul>
-        <li ng-repeat="product in data.products">
-          <a href="#/" ng-click="addProduct(product.id)">{{product.title}}</a>
+      <ul class="list-group">
+        <li ng-repeat="product in data.products" class="list-group-item">
+          <h5>{{ product.name }}</h5>
+          <span class="badge add-cart" ng-click="addProduct(product)">Add to cart</span>
+          <div>Price: {{ product.price | currency:"&euro;" }}</div>
         </li>
       </ul>
     </div>
+
     <div class="col-md-4">
-      {{ data.cart() }}
+      <span ng-show="data.cartService.cart.length > 0">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <td>Product Name</td>
+            <td>Quantity</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="lineItem in data.cartService.cart track by $index">
+            <td>{{ lineItem.name }}</td>
+            <td>{{ lineItem.quantity }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <button type="button" class="btn btn-primary btn-block">Checkout</button>
+      <button ng-click="data.cartService.clear()" type="button" class="btn btn-danger btn-block">Clear</button>
+    </span>
     </div>
+
   </div>
 </div>

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('unipimart')
-  .factory('userService', function($window, $location, $http, authService) {
+  .factory('userService', function($window, $location, $http, authService, cartService) {
     return {
       login: function(user) {
         return $http.post('/api/login', {
@@ -12,6 +12,7 @@ angular.module('unipimart')
       logout: function() {
         if (authService.isAuthed) {
           authService.clearAuthedStatus();
+          cartService.clear();
           $location.path('/login');
         }
       },

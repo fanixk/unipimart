@@ -30,7 +30,7 @@ angular
     $httpProvider.interceptors.push('authInterceptor');
   });
 
-function auth_interceptor($rootScope, $q, $window, authService, $location) {
+function auth_interceptor($rootScope, $q, $window, authService, $location, cartService) {
   return {
     request: function(config) {
       config.headers = config.headers || {};
@@ -40,10 +40,11 @@ function auth_interceptor($rootScope, $q, $window, authService, $location) {
       return config;
     },
     response: function(response) {
-      // restore authService
+      // restore authService / cartService on refresh
       if (response && response.status === 200 && $window.sessionStorage.token && !authService.isAuthed) {
         authService.isAuthed = true;
         authService.user = $window.sessionStorage.user;
+        cartService.cart = cartService.getProducts();
       }
       return response || $q.when(response);
     },
@@ -51,6 +52,7 @@ function auth_interceptor($rootScope, $q, $window, authService, $location) {
       // token expiration
       if (response && response.status === 401 && ($window.sessionStorage.token || authService.isAuthed)) {
         authService.clearAuthedStatus();
+        cartService.clear();
         $location.path('/login');
       } else if (response && response.status === 401) {  // requiredLogin
         $location.path('/login');

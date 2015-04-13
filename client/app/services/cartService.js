@@ -3,40 +3,48 @@
 angular.module('unipimart')
   .factory('cartService', function($window) {
     return {
-      addProduct: function(id) {
-        var products = this.getProducts(),
-          added;
-        var cartProducts = products.map(function(product) {
-          if (product.id === id) {
+      cart: [],
+      addProduct: function(product) {
+        var added;
+        var cartProducts = this.cart.map(function(cartProduct) {
+          if (cartProduct.id === product.id) {
             added = true;
-            product.quantity++;
+            cartProduct.quantity++;
           }
-          return product;
+          return cartProduct;
         });
         if (!added) {
-          cartProducts.push({ id: id, quantity: 1});
+          cartProducts.push({ id: product.id, name: product.name, quantity: 1});
         }
         this.storeProducts(cartProducts);
       },
       removeProduct: function(id) {
-        var products = this.getProducts();
-        var cartProducts = products.map(function(product) {
-          if (product.id === id) {
-            product.quantity--;
+        var cartProducts = this.cart.map(function(cartProduct) {
+          if (cartProduct.id === id) {
+            cartProduct.quantity--;
           }
-          if (product.quantity !== 0) {
-            return product;
+          if (cartProduct.quantity !== 0) {
+            return cartProduct;
           }
         });
         this.storeProducts(cartProducts);
       },
       getProducts: function() {
         $window.sessionStorage.cart = $window.sessionStorage.cart || [];
-        return JSON.parse($window.sessionStorage.cart);
+        try {
+          return JSON.parse($window.sessionStorage.cart);
+        } catch(ex) {
+          return $window.sessionStorage.cart;
+        }
       },
       storeProducts: function(products) {
+        this.cart = products;
         // sessionStorage can't store objects so we store json string
         $window.sessionStorage.cart = JSON.stringify(products);
+      },
+      clear: function() {
+        this.cart = [];
+        delete $window.sessionStorage.cart;
       }
     };
   });
