@@ -14,7 +14,7 @@ angular.module('unipimart')
           return cartProduct;
         });
         if (!added) {
-          cartProducts.push({ id: product.id, name: product.name, quantity: 1});
+          cartProducts.push({ id: product.id, name: product.name, price: product.price, quantity: 1});
         }
         this.storeProducts(cartProducts);
       },
@@ -45,6 +45,11 @@ angular.module('unipimart')
       clear: function() {
         this.cart = [];
         delete $window.sessionStorage.cart;
+      },
+      totalPrice: function() {
+        return this.cart.reduce(function(prevVal, currVal) {
+          return prevVal + currVal.price * currVal.quantity;
+        }, 0);
       }
     };
   });
