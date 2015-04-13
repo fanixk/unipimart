@@ -6,28 +6,24 @@ angular.module('unipimart')
       cart: [],
       addProduct: function(product) {
         var added;
-        var cartProducts = this.cart.map(function(cartProduct) {
+        this.cart.forEach(function(cartProduct) {
           if (cartProduct.id === product.id) {
             added = true;
             cartProduct.quantity++;
           }
-          return cartProduct;
         });
         if (!added) {
-          cartProducts.push({ id: product.id, name: product.name, price: product.price, quantity: 1});
+          this.cart.push({ id: product.id, name: product.name, price: product.price, quantity: 1});
         }
-        this.storeProducts(cartProducts);
+        this.storeProducts(this.cart);
       },
       removeProduct: function(id) {
-        var cartProducts = this.cart.map(function(cartProduct) {
+        this.cart.forEach(function(cartProduct) {
           if (cartProduct.id === id) {
             cartProduct.quantity--;
           }
-          if (cartProduct.quantity !== 0) {
-            return cartProduct;
-          }
         });
-        this.storeProducts(cartProducts);
+        this.storeProducts(this.cart);
       },
       getProducts: function() {
         $window.sessionStorage.cart = $window.sessionStorage.cart || [];
@@ -38,7 +34,6 @@ angular.module('unipimart')
         }
       },
       storeProducts: function(products) {
-        this.cart = products;
         // sessionStorage can't store objects so we store json string
         $window.sessionStorage.cart = JSON.stringify(products);
       },

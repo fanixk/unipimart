@@ -21,7 +21,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="lineItem in data.cartService.cart track by $index">
+          <tr ng-repeat="lineItem in data.cartService.cart | orderBy: 'name'">
             <td>{{ lineItem.name }}</td>
             <td>{{ lineItem.quantity }}</td>
           </tr>

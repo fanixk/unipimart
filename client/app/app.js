@@ -3,7 +3,7 @@
 angular
   .module('unipimart', [
     'ngRoute',
-    'ngSanitize',
+    'ngSanitize'
   ])
   .config(function($routeProvider) {
     $routeProvider
@@ -52,7 +52,7 @@ function auth_interceptor($rootScope, $q, $window, authService, $location, cartS
       // token expiration
       if (response && response.status === 401 && ($window.sessionStorage.token || authService.isAuthed)) {
         authService.clearAuthedStatus();
-        cartService.clear();
+        // cartService.clear();
         $location.path('/login');
       } else if (response && response.status === 401) {  // requiredLogin
         $location.path('/login');
