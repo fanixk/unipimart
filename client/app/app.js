@@ -44,7 +44,7 @@ function auth_interceptor($rootScope, $q, $window, authService, $location, cartS
       if (response && response.status === 200 && $window.sessionStorage.token && !authService.isAuthed) {
         authService.isAuthed = true;
         authService.user = $window.sessionStorage.user;
-        cartService.cart = cartService.getProducts();
+        cartService.cart = cartService.getProducts() || [];
       }
       return response || $q.when(response);
     },
