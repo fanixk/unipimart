@@ -21,7 +21,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="lineItem in data.cartService.cart track by $index">
+          <tr ng-repeat="lineItem in data.cartService.cart | orderBy: 'name'"> <!-- track by $index -->
             <td>{{ lineItem.name }}</td>
             <td>{{ lineItem.quantity }}</td>
           </tr>
@@ -30,6 +30,9 @@
 
       <button type="button" class="btn btn-primary btn-block">Checkout</button>
       <button ng-click="data.cartService.clear()" type="button" class="btn btn-danger btn-block">Clear</button>
+    </span>
+    <span ng-hide="data.cartService.cart.length > 0">
+      <p class="bg-info" style="padding: 15px;"><strong>Empty cart!</strong></p>
     </span>
     </div>
 
