@@ -18,9 +18,6 @@ var credentials = {
 
 var app = express();
 
-// Force use of https
-app.use(forceSSL);
-
 // Content Security Policy Header
 // default Content security policy is to allow content loading only from same origin
 // defaultSrc applies as a fallback to all sources not defined
@@ -60,6 +57,9 @@ app.use(helmet.hsts({
 
 // Hide X-Powered-By header
 app.use(helmet.hidePoweredBy());
+
+// Force use of https
+app.use(forceSSL);
 
 app.use(express.static(__dirname + '/client'));
 // only accepts content-type application/json
