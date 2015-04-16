@@ -13,7 +13,28 @@ var express = require('express'),
 
 var credentials = {
   key: fs.readFileSync('./server/config/ssl/key.pem'),
-  cert: fs.readFileSync('./server/config/ssl/cert.pem')
+  cert: fs.readFileSync('./server/config/ssl/cert.pem'),
+  // cipher list from https://iojs.org/api/tls.html
+  // https://www.openssl.org/docs/apps/ciphers.html#CIPHER-LIST-FORMAT
+  ciphers: [
+    'ECDHE-RSA-AES256-SHA384', // (PerfectForwarSecrecy-KeyExchange-Encryption-InputToPseudoRandomFunction)
+    'DHE-RSA-AES256-SHA384',
+    'ECDHE-RSA-AES256-SHA256',
+    'DHE-RSA-AES256-SHA256',
+    'ECDHE-RSA-AES128-SHA256',
+    'DHE-RSA-AES128-SHA256',
+    'HIGH',    // > 128bit
+    '!aNULL',  // blacklist no authentication
+    '!eNULL',  // blacklist no encryption
+    '!EXPORT', //   >>      40-56 bit
+    '!DES',
+    '!RC4',
+    '!MD5',
+    '!PSK',    // blacklist preshared key
+    '!SRP',
+    '!CAMELLIA'
+  ].join(':'),
+  honorCipherOrder: true
 };
 
 var app = express();
@@ -51,8 +72,9 @@ app.use(helmet.frameguard('deny'));
 // HSTS also disables the ability for user's to ignore SSL negotiation warnings.
 // It basically tells user agents to interact with it in the future only over HTTPS.
 app.use(helmet.hsts({
-  maxAge: 7776000000,     // 90 days
-  includeSubdomains: true
+  maxAge: 7776000000, // 90 days
+  includeSubdomains: true,
+  force: true
 }));
 
 // Hide X-Powered-By header
@@ -78,8 +100,8 @@ app.all('*', function(req, res, next) {
 });
 
 // error handler
-app.use(function(err, req, res, next) {
-  var code, msg; //default http 500
+app.use(function(err, req, res) {
+  var code, msg;
 
   switch (err.name) {
   case 'UnauthorizedError':
@@ -113,4 +135,3 @@ var secureServer = https.createServer(credentials, app).listen(app.get('httpsPor
 var server = http.createServer(app).listen(app.get('port'), function() {
   console.log('Express server listening on port ' + server.address().port);
 });
-
