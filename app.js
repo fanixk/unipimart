@@ -39,6 +39,27 @@ var credentials = {
 
 var app = express();
 
+// Public-Key-Pins header
+// https://developer.mozilla.org/en-US/docs/Web/Security/Public_Key_Pinning
+app.use(helmet.publicKeyPins({
+  maxAge: 7776000000, // 90 days in ms
+  sha256s: ['ruz/deaV4RYJaAVlM0ezwcN+UiegCDcAgnUb0mWPJBw=', 'backup'],
+  includeSubdomains: true,
+}));
+
+// Implement Strict-Transport-Security header
+// Response header -> Strict-Transport-Security: max-age=7776000; includeSubDomains
+// HTTP Strict-Transport-Security (HSTS) enforces secure (HTTP over SSL/TLS) connections to the server. 
+// This reduces impact of bugs in web applications leaking session data through cookies and external links 
+// and defends against Man-in-the-middle attacks. 
+// HSTS also disables the ability for user's to ignore SSL negotiation warnings.
+// It basically tells user agents to interact with it in the future only over HTTPS.
+app.use(helmet.hsts({
+  maxAge: 7776000000, // 90 days
+  // includeSubdomains: true,
+  force: true
+}));
+
 // Content Security Policy Header
 // default Content security policy is to allow content loading only from same origin
 // defaultSrc applies as a fallback to all sources not defined
@@ -64,19 +85,6 @@ app.use(helmet.xssFilter());
 // Prevents clickjacking attacks
 app.use(helmet.frameguard('deny'));
 
-// Implement Strict-Transport-Security header
-// Response header -> Strict-Transport-Security: max-age=7776000; includeSubDomains
-// HTTP Strict-Transport-Security (HSTS) enforces secure (HTTP over SSL/TLS) connections to the server. 
-// This reduces impact of bugs in web applications leaking session data through cookies and external links 
-// and defends against Man-in-the-middle attacks. 
-// HSTS also disables the ability for user's to ignore SSL negotiation warnings.
-// It basically tells user agents to interact with it in the future only over HTTPS.
-app.use(helmet.hsts({
-  maxAge: 7776000000, // 90 days
-  includeSubdomains: true,
-  force: true
-}));
-
 // Hide X-Powered-By header
 app.use(helmet.hidePoweredBy());
 
@@ -100,7 +108,7 @@ app.all('*', function(req, res, next) {
 });
 
 // error handler
-app.use(function(err, req, res) {
+app.use(function(err, req, res, next) {
   var code, msg;
 
   switch (err.name) {
