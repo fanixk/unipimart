@@ -1,9 +1,9 @@
 {
   "development": {
-    "driver": "mysql",
+    "driver": "postgres",
     "host": "localhost",
     "database": "unipimart",
-    "user": "root",
+    "user": "postgres",
     "password": ""
   }
 }
