@@ -1,1 +1,1 @@
-CREATE DATABASE IF NOT EXISTS unipimart;
+CREATE DATABASE unipimart;
