@@ -92,7 +92,7 @@ app.use(helmet.publicKeyPins({
 app.use(forceSSL);
 
 app.use(express.static(__dirname + '/client'));
-// only accepts content-type application/json
+
 app.use(bodyParser.json());
 
 // Auth Middleware
