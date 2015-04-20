@@ -109,3 +109,11 @@ body {
 .navbar {
   border-radius: 0
 }
+
+.search {
+  margin-bottom: 5px
+}
+
+.info-label {
+  padding: 15px
+}

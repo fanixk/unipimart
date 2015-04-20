@@ -1,4 +1,5 @@
 var _ = require('lodash'),
+  sanitizer = require('sanitizer'),
   Sequelize = require('sequelize'),
   db = require('../config/db.js');
 
@@ -35,19 +36,25 @@ module.exports = {
         });
     }
 
+    // html sanitize for xss protection
+    searchParam = sanitizer.sanitize(searchParam);
+
     // SELECT "id", "name", "description", "price" FROM "products" AS "product" 
     // WHERE ("product"."name" LIKE '%searchParam%' 
     // OR "product"."description" LIKE '%searchParam%');
     Product.findAll({
       where: {
         $or: [
-          { name: { $like: '%' + searchParam + '%' } }, 
+          { name: { $like: '%' + searchParam + '%' } },
           { description: { $like: '%' + searchParam + '%' } }
         ]
       }
     })
     .then(function(products) {
-      return res.json(products);
+      return res.json({
+        products: products,
+        searchParam: searchParam
+      });
     });
   }
 }
