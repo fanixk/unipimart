@@ -26,24 +26,28 @@ module.exports = {
       });
   },
   search: function(req, res) {
-    var name = req.body.name;
+    var searchParam = req.body.search || '';
 
-    if (_.isEmpty(name)) {
+    if (_.isEmpty(searchParam)) {
       return res.status(400)
         .json({
-          msg: 'No name parameter found'
+          msg: 'No search parameter found'
         });
     }
 
+    // SELECT "id", "name", "description", "price" FROM "products" AS "product" 
+    // WHERE ("product"."name" LIKE '%searchParam%' 
+    // OR "product"."description" LIKE '%searchParam%');
     Product.findAll({
-        where: {
-          name: {
-            $like: '%' + name + '%' // Make sure sql injections can't happen
-          }
-        }
-      })
-      .then(function(products) {
-        return res.json(products);
-      });
+      where: {
+        $or: [
+          { name: { $like: '%' + searchParam + '%' } }, 
+          { description: { $like: '%' + searchParam + '%' } }
+        ]
+      }
+    })
+    .then(function(products) {
+      return res.json(products);
+    });
   }
 }
