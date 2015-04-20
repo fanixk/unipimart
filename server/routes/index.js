@@ -6,5 +6,6 @@ var express = require('express'),
 router.post('/api/login', user.login);
 router.post('/api/register', user.register);
 router.get('/api/catalog', product.list);
+router.post('/api/catalog/search', product.search);
 
 module.exports = router;

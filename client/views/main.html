@@ -2,9 +2,24 @@
   <div class="row">
 
     <div class="col-md-8">
+      <!-- <div class="input-group search">
+        <input type="text" class="form-control" placeholder="Search for..." ng-model="data.searchParam" ng-change="search()" ng-model-options="{debounce: 500}">
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="button" ng-click="search()">Search!</button>
+        </span>
+      </div> -->
+      <div class="input-group search">
+          <input type="text" class="form-control" placeholder="Search for..." ng-model="data.searchParam" ng-change="search()" ng-model-options="{ debounce: 500 }" />
+          <span class="input-group-addon">
+              <i class="glyphicon glyphicon-search"></i>
+          </span>
+      </div>
+      <p ng-show="data.boundSearchParam" class="bg-info info-label"><strong>Searched for: {{ data.boundSearchParam }}</strong></p>
+
       <ul class="list-group">
         <li ng-repeat="product in data.products" class="list-group-item">
           <h5>{{ product.name }}</h5>
+          <div>{{ product.description }}</div>
           <span class="badge add-cart" ng-click="addProduct(product)">Add to cart</span>
           <div>Price: {{ product.price | currency:"&euro;" }}</div>
         </li>
@@ -27,7 +42,7 @@
           </tr>
         </tbody>
       </table>
-      <p class="bg-info" style="padding: 15px;"><strong>Total price: {{ data.cartService.totalPrice() | currency:"&euro;" }}</strong></p>
+      <p class="bg-info info-label"><strong>Total price: {{ data.cartService.totalPrice() | currency:"&euro;" }}</strong></p>
       <button type="button" class="btn btn-primary btn-block">Checkout</button>
       <button ng-click="data.cartService.clear()" type="button" class="btn btn-danger btn-block">Clear</button>
     </span>
