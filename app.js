@@ -14,23 +14,28 @@ var express = require('express'),
 var credentials = {
   key: fs.readFileSync('./server/config/ssl/key.pem'),
   cert: fs.readFileSync('./server/config/ssl/cert.pem'),
-  // cipher list from https://iojs.org/api/tls.html
-  // https://www.openssl.org/docs/apps/ciphers.html#CIPHER-LIST-FORMAT
+  // cipher list modern secure recommendations from https://wiki.mozilla.org/Security/Server_Side_TLS
+  // https://www.openssl.org/docs/apps/ciphers.html#CIPHER-LIST-FORMAT 
   ciphers: [
-    'ECDHE-RSA-AES256-SHA384', // (PerfectForwarSecrecy-KeyExchange-Encryption-InputToPseudoRandomFunction)
-    'DHE-RSA-AES256-SHA384',
-    'ECDHE-RSA-AES256-SHA256',
-    'DHE-RSA-AES256-SHA256',
-    'ECDHE-RSA-AES128-SHA256',
-    'DHE-RSA-AES128-SHA256',
-    'HIGH',    // > 128bit
-    '!aNULL',  // blacklist no authentication
-    '!eNULL',  // blacklist no encryption
-    '!EXPORT', //   >>      40-56 bit
+    'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256',
+    'ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384',
+    'DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256',
+    'kEDH+AESGCM',
+    'ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256',
+    'ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA',
+    'ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384',
+    'ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA',
+    'DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA',
+    'DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256',
+    'DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA',
+    '!aNULL',   // blacklist no authentication
+    '!eNULL',   //     >>    no encryption
+    '!EXPORT',  //     >>    40-56 bit
     '!DES',
     '!RC4',
+    '!3DES',
     '!MD5',
-    '!PSK',    // blacklist preshared key
+    '!PSK',     // blacklist preshared key
     '!SRP',
     '!CAMELLIA'
   ].join(':'),
