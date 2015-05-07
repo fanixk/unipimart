@@ -1,14 +1,15 @@
 'use strict'
 
 angular.module('unipimart')
-  .controller('MainCtrl', function($scope, $http, $window, cartService) {
+  .controller('MainCtrl', function($scope, $http, $window, cartService, $timeout) {
     $scope.data = $scope.data || {};
     $scope.data.cartService = cartService;
-
+    $scope.data.lastItemAdded = {};
     getAllProducts();
 
     $scope.addProduct = function(product) {
       cartService.addProduct(product);
+      $scope.data.lastItemAdded = product;
     }
 
     $scope.removeProduct = function(id) {
@@ -27,6 +28,16 @@ angular.module('unipimart')
           $scope.data.products = data.products;
           $scope.data.boundSearchParam = data.searchParam;
         });
+    }
+
+    $scope.isLastAdded = function(lineItem) {
+      if (lineItem.id == $scope.data.lastItemAdded.id) {
+        // reset class after 500ms
+        $timeout(function() {
+          $scope.data.lastItemAdded = {};
+        }, 500);
+        return true;
+      }
     }
 
     function getAllProducts() {
