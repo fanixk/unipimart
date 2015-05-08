@@ -13,6 +13,7 @@ var express = require('express'),
 
 var credentials = {
   key: fs.readFileSync('./server/config/ssl/key.pem'),
+  // add ca
   cert: fs.readFileSync('./server/config/ssl/cert.pem'),
   // cipher list modern secure recommendations from https://wiki.mozilla.org/Security/Server_Side_TLS
   // https://www.openssl.org/docs/apps/ciphers.html#CIPHER-LIST-FORMAT 
@@ -89,7 +90,7 @@ app.use(helmet.hsts({
 // https://developer.mozilla.org/en-US/docs/Web/Security/Public_Key_Pinning
 app.use(helmet.publicKeyPins({
   maxAge: 7776000000, // 90 days in ms
-  sha256s: ['ruz/deaV4RYJaAVlM0ezwcN+UiegCDcAgnUb0mWPJBw=', 'BackupPin'],
+  sha256s: ['PbQ35imK386KmjPI8wtPmH04d/8ETebo7JP9JODVuys=', 'BackupPin'],
   includeSubdomains: true,
 }));
 
@@ -130,8 +131,8 @@ app.use(function(err, req, res, next) {
     msg = err.inner;
     break;
   default:
-    code = 500;
-    msg = { errorMsg: 'Internal Server Error' }; //default http 500
+    // code = 500;
+    // msg = { errorMsg: 'Internal Server Error' }; //default http 500
   }
 
   res.status(code).json(msg);

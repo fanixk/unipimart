@@ -100,6 +100,7 @@ function generateToken(user) {
 }
 
 module.exports = {
+  User: User,
   login: function(req, res) {
 
     var email = req.body.email || '',
