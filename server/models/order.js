@@ -135,7 +135,7 @@ function buildOrder(user, address) {
 
 function buildLineItems(orderId, lineItems) {
   var rItems = [];
-
+  //TODO round quantity
   lineItems.forEach(function(item) {
     rItems.push({
       orderId: orderId,
