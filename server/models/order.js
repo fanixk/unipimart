@@ -8,14 +8,19 @@ var _ = require('lodash'),
   Product = require('./product').Product,
   User = require('./user').User;
 
+var INVALID_LINEITEM_ERROR = 'Invalid product or quantity.',
+    MISSING_STREETNAME_ERROR = 'Missing Street Name.',
+    MISSING_STREETNUM_ERROR = 'Missing Street Num.',
+    MISSING_ZIPCODE_ERROR = 'Missing Zipcode.',
+    MISSING_CITY_ERROR = 'Missing City.',
+    MISSING_PHONE_ERROR = 'Missing Phone.';
+
 var LineItem = db.define('line_item', {
   id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
   productId: { type: Sequelize.INTEGER, foreignKey: true, allowNull: false, field: 'product_id' },
   orderId: { type: Sequelize.INTEGER, foreignKey: true, field: 'order_id' },
   quantity: { type: Sequelize.INTEGER, allowNull: false, defaultValue: 1 }
-}, {
-  timestamps: false
-});
+}, { timestamps: false });
 
 var Order = db.define('order', {
   id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
@@ -23,10 +28,10 @@ var Order = db.define('order', {
   streetName: { type: Sequelize.STRING, allowNull: false, field: 'street_name' },
   streetNum: { type: Sequelize.STRING, allowNull: false, field: 'street_num' },
   zipcode: { type: Sequelize.STRING, allowNull: false },
+  city: { type: Sequelize.STRING, allowNull: false },
+  phone: { type: Sequelize.STRING, allowNull: false },
   userId: { type: Sequelize.INTEGER, allowNull: false, foreignKey: true, field: 'user_id' }
-}, {
-  timestamps: false
-});
+}, { timestamps: false });
 
 LineItem.belongsTo(Product);
 LineItem.belongsTo(Order);
@@ -34,12 +39,82 @@ LineItem.belongsTo(Order);
 Order.hasMany(LineItem, { as: 'Items' });
 Order.belongsTo(User);
 
-function validateOrder() {
-
+function respondFailure() {
+  return res.status(400).json({
+    success: false
+  });
 }
 
-function mailer() {
+function validateOrder(lineItems, address) {
+  var errors = [],
+    isValid = true;
 
+  lineItems.forEach(function(item) {
+    var id = item.id,
+      quantity = item.quantity;
+    if (!id || !quantity || quantity <= 0) {
+      isValid = false;
+      errors.push(INVALID_LINEITEM_ERROR);
+    }
+  });
+
+  if (_.isEmpty(address.streetName)) {
+    isValid = false;
+    errors.push(MISSING_STREETNAME_ERROR);
+  }
+
+  if (_.isEmpty(address.streetNum)) {
+    isValid = false;
+    errors.push(MISSING_STREETNUM_ERROR);
+  }
+
+  if (_.isEmpty(address.zipcode)) {
+    isValid = false;
+    errors.push(MISSING_ZIPCODE_ERROR);
+  }
+
+  if (_.isEmpty(address.city)) {
+    isValid = false;
+    errors.push(MISSING_CITY_ERROR);
+  }
+
+  if (_.isEmpty(address.phone)) {
+    isValid = false;
+    errors.push(MISSING_PHONE_ERROR);
+  }
+
+  return {
+    isValid: isValid,
+    errors: errors
+  };
+}
+
+function mailer(order) {
+  // var transporter = nodemailer.createTransport({
+  //   service: 'gmail',
+  //   auth: {
+  //     user: 'unipimart@gmail.com',
+  //     pass: 'yolo'
+  //   }
+  // });
+
+  // transporter.sendMail({
+  //   from: 'unipimart@gmail.com',
+  //   to: 'unipimart@gmail.com',
+  //   subject: 'hello',
+  //   text: 'hello world!'
+  // });
+  order.getUser().then(function(usr) {
+    console.log('User = ', usr.email);
+  });
+  console.log('Price = ', order.price);
+  order.getItems().then(function(it) {
+    it.forEach(function(item) {
+      item.getProduct().then(function(product) {
+        console.log(product.name, ' x', item.quantity);
+      });
+    });
+  });
 }
 
 function buildOrder(user, address) {
@@ -47,7 +122,9 @@ function buildOrder(user, address) {
     userId: user.id,
     streetName: address.streetName,
     streetNum: address.streetNum,
-    zipcode: address.zipcode
+    zipcode: address.zipcode,
+    city: address.city,
+    phone: address.phone
   };
 }
 
@@ -81,13 +158,15 @@ function calcTotalPrice(lineItems) {
   })
   .then(function(products) {
     var totalPrice = 0.0;
-    products.forEach(function(product, i) {
+
+    products.forEach(function(product) {
       // find quantity for each product (TODO: check uniqueness of product ids)
       var quantity = _.result(_.find(lineItems, { 'productId': product.id}), 'quantity');
-      if(!quantity) quantity = 0.0;
+      if(!quantity) quantity = 0;
       //calc total price
       totalPrice += priceInCents(product.price) * quantity;
     });
+
     return totalPrice / 100;
   });
 }
@@ -107,26 +186,42 @@ module.exports = {
       address = {
         streetName: req.body.streetName || '',
         streetNum: req.body.streetNum || '',
-        zipcode: req.body.zipcode || ''
+        zipcode: req.body.zipcode || '',
+        city: req.body.city || '',
+        phone: req.body.phone || ''
       };
-    
-    var usavedOrder = buildOrder(user, address);
-    
-    Order.create(usavedOrder)
-    .then(function(order) {
-      var bLineItems = buildLineItems(order.id, lineItems);
 
-      LineItem.bulkCreate(bLineItems)
-        .then(calcTotalPrice)
-        .then(function(orderPrice) {
-          return setOrderPrice(orderPrice, order);
-        })
-        .then(mailer)
-        .then(function() {
-          // order.getItems().then(function(it) { console.log(it);});
-          return res.json({success: true});
+    var validator = validateOrder(lineItems, address);
+    
+    if (!validator.isValid) {
+      return res.status(400)
+        .json({
+          errors: validator.errors
         });
-      });
+    }
+
+    var unsavedOrder = buildOrder(user, address);
+    
+    Order.create(unsavedOrder)
+      .then(function(order) {
+        var bLineItems = buildLineItems(order.id, lineItems);
+
+        LineItem.bulkCreate(bLineItems)
+          .then(calcTotalPrice)
+          .then(function(orderPrice) {
+            return setOrderPrice(orderPrice, order);
+          })
+          .then(function() {
+            mailer(order);
+          })
+          .then(function() {
+            return res.json({
+              success: true
+            });
+          })
+          .catch(respondFailure);
+      })
+      .catch(respondFailure);
   }
 }
 

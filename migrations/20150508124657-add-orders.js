@@ -11,8 +11,7 @@ exports.up = function(db, callback) {
     },
     price: {
       type: 'decimal',
-      unsigned: true,
-      allowNull: false
+      unsigned: true
     },
     street_name: {
       type: 'string',
@@ -23,6 +22,14 @@ exports.up = function(db, callback) {
       notNull: true,
     },
     zipcode: {
+      type: 'string',
+      notNull: true
+    },
+    city: {
+      type: 'string',
+      notNull: true
+    },
+    phone: {
       type: 'string',
       notNull: true
     },
