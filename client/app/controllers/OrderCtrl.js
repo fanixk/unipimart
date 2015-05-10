@@ -21,13 +21,9 @@ angular.module('unipimart')
         cart: cartService.getProducts(),
         address: $scope.address
       }).success(function(data) {
-        if (data.success === true) {
-          $scope.data.success = true;
-        } else {
-          $scope.data.success = false;
-        }
+        $scope.data.success = data.success;
         $scope.data.step = 4;
       });
     }
-    
+
   });

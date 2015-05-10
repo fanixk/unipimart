@@ -1,6 +1,9 @@
 <div class="row" ng-if="data.step === 1">
   <div class="col-md-3"></div>
   <div class="col-md-6">
+    <span>
+      <p class="bg-info" style="padding: 15px;"><strong>Step 1 of 3</strong></p>
+    </span>
     <div ng-include src="'views/cart.html'"></div>
     <!-- TODO hide if empty cart -->
     <button class="btn btn-primary btn-lg btn-block" ng-click="showAddressForm()">Checkout!</button>
@@ -11,7 +14,9 @@
 <div class="row" ng-if="data.step === 2">
   <div class="col-md-3"></div>
   <div class="col-md-6">
-
+  <span>
+    <p class="bg-info" style="padding: 15px;"><strong>Step 2 of 3</strong></p>
+  </span>
   <form class="form-horizontal" ng-submit="showOverview()">
         <div class="form-group">
           <label for="inputStreetName" class="col-sm-2 control-label">Street Name</label>
@@ -57,6 +62,9 @@
 <div class="row" ng-if="data.step === 3">
   <div class="col-md-3"></div>
   <div class="col-md-6">
+    <span>
+      <p class="bg-info" style="padding: 15px;"><strong>Step 3 of 3</strong></p>
+    </span>
     <div ng-include src="'views/cart.html'"></div>
     <div>Street Name: {{ address.streetName }}</div>
     <div>Street Number: {{ address.streetNum }}</div>
@@ -76,7 +84,7 @@
       <p class="bg-success" style="padding: 15px;"><strong>Order was successfully received!</strong></p>
     </span>
     <span ng-if="!data.success">
-      <p class="bg-warning" style="padding: 15px;"><strong>Something went wrong!</strong></p>
+      <p class="bg-danger" style="padding: 15px;"><strong>Something went wrong!</strong></p>
     </span>
     <button class="btn btn-primary btn-lg btn-block" ng-click="go('/')">Return to Catalog</button>
   </div>
