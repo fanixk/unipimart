@@ -90,7 +90,7 @@ app.use(helmet.hsts({
 // https://developer.mozilla.org/en-US/docs/Web/Security/Public_Key_Pinning
 app.use(helmet.publicKeyPins({
   maxAge: 7776000000, // 90 days in ms
-  sha256s: ['f0G8go7SQgHtzd1izDOHoZTuviPL5ULXrb5/qUQ5MIA='],
+  sha256s: ['f0G8go7SQgHtzd1izDOHoZTuviPL5ULXrb5/qUQ5MIA=', 'PbQ35imK386KmjPI8wtPmH04d/8ETebo7JP9JODVuys='],
   includeSubdomains: true,
 }));
 
