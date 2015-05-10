@@ -12,8 +12,9 @@ var express = require('express'),
   notFoundError = require('./server/errors/notFoundError');
 
 var credentials = {
-  key: fs.readFileSync('./server/config/ssl/key.pem'),
-  cert: fs.readFileSync('./server/config/ssl/cert.pem'),
+  key: fs.readFileSync('./server/config/ssl/private.key'),
+  ca: [ fs.readFileSync('./server/config/ssl/rootCA.pem') ],
+  cert: fs.readFileSync('./server/config/ssl/cert.crt'),
   // cipher list modern secure recommendations from https://wiki.mozilla.org/Security/Server_Side_TLS
   // https://www.openssl.org/docs/apps/ciphers.html#CIPHER-LIST-FORMAT 
   ciphers: [
@@ -89,7 +90,7 @@ app.use(helmet.hsts({
 // https://developer.mozilla.org/en-US/docs/Web/Security/Public_Key_Pinning
 app.use(helmet.publicKeyPins({
   maxAge: 7776000000, // 90 days in ms
-  sha256s: ['ruz/deaV4RYJaAVlM0ezwcN+UiegCDcAgnUb0mWPJBw=', 'BackupPin'],
+  sha256s: ['f0G8go7SQgHtzd1izDOHoZTuviPL5ULXrb5/qUQ5MIA=', 'PbQ35imK386KmjPI8wtPmH04d/8ETebo7JP9JODVuys='],
   includeSubdomains: true,
 }));
 
@@ -140,11 +141,12 @@ app.use(function(err, req, res, next) {
 app.set('httpsPort', process.env.httpsPort || 8443);
 app.set('port', process.env.PORT || 8000);
 
+var server = http.createServer(app).listen(app.get('port'), function() {
+  console.log('Express server listening on port ' + server.address().port);
+});
+
 // Start the server
 var secureServer = https.createServer(credentials, app).listen(app.get('httpsPort'), function() {
   console.log('Express secure server listening on port ' + secureServer.address().port);
 });
 
-var server = http.createServer(app).listen(app.get('port'), function() {
-  console.log('Express server listening on port ' + server.address().port);
-});

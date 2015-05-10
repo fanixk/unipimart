@@ -1,0 +1,20 @@
+<span ng-show="data.cartService.cart.length > 0">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Product Name</th>
+        <th>Quantity</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="lineItem in data.cartService.cart | orderBy: 'name'">
+        <td>{{ lineItem.name }}</td>
+        <td>{{ lineItem.quantity }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="bg-info info-label"><strong>Total price: {{ data.cartService.totalPrice() | currency:"&euro;" }}</strong></p>
+</span>
+<span ng-hide="data.cartService.cart.length > 0">
+<p class="bg-info" style="padding: 15px;"><strong>Empty cart!</strong></p>
+</span>

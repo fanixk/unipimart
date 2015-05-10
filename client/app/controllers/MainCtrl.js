@@ -1,7 +1,7 @@
 'use strict'
 
 angular.module('unipimart')
-  .controller('MainCtrl', function($scope, $http, $window, cartService, $timeout) {
+  .controller('MainCtrl', function($scope, $http, $window, $location, cartService, $timeout) {
     $scope.data = $scope.data || {};
     $scope.data.cartService = cartService;
     $scope.data.lastItemAdded = {};
