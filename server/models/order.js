@@ -52,6 +52,7 @@ function validateOrder(lineItems, address) {
   lineItems.forEach(function(item) {
     var id = item.id,
       quantity = item.quantity;
+    // TODO Check numericallity
     if (!id || !quantity || quantity <= 0) {
       isValid = false;
       errors.push(INVALID_LINEITEM_ERROR);
@@ -103,7 +104,11 @@ function mailer(order) {
   //   to: 'unipimart@gmail.com',
   //   subject: 'hello',
   //   text: 'hello world!'
+  // }, function(err, info) {
+  //   console.log(info);
+  //   if(err) console.log(err);
   // });
+
   order.getUser().then(function(usr) {
     console.log('User = ', usr.email);
   });
@@ -131,12 +136,11 @@ function buildOrder(user, address) {
 function buildLineItems(orderId, lineItems) {
   var rItems = [];
 
-  // validate quantity & product existance
   lineItems.forEach(function(item) {
     rItems.push({
       orderId: orderId,
       productId: item.id,
-      quantity: item.quantity || 1
+      quantity: item.quantity
     });
   });
   return rItems;
@@ -184,11 +188,11 @@ module.exports = {
     var user = req.user,
       lineItems = req.body.cart || [],
       address = {
-        streetName: req.body.streetName || '',
-        streetNum: req.body.streetNum || '',
-        zipcode: req.body.zipcode || '',
-        city: req.body.city || '',
-        phone: req.body.phone || ''
+        streetName: req.body.address.streetName || '',
+        streetNum: req.body.address.streetNum || '',
+        zipcode: req.body.address.zipcode || '',
+        city: req.body.address.city || '',
+        phone: req.body.address.phone || ''
       };
 
     var validator = validateOrder(lineItems, address);

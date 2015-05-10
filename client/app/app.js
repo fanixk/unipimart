@@ -19,6 +19,10 @@ angular
         templateUrl: 'views/register.html',
         controller: 'RegisterCtrl'
       })
+      .when('/checkout', {
+        templateUrl: 'views/checkout.html',
+        controller: 'OrderCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });

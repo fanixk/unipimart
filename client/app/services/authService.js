@@ -17,6 +17,12 @@ angular.module('unipimart')
           $location.path('/');
         }
       },
+      redirectUnauthorized: function() {
+        this.check();
+        if(!this.isAuthed) {
+          $location.path('/');
+        }
+      },
       clearAuthedStatus: function() {
         this.isAuthed = false;
         delete this.user;

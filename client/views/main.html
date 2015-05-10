@@ -2,12 +2,6 @@
   <div class="row">
 
     <div class="col-md-8">
-      <!-- <div class="input-group search">
-        <input type="text" class="form-control" placeholder="Search for..." ng-model="data.searchParam" ng-change="search()" ng-model-options="{debounce: 500}">
-        <span class="input-group-btn">
-          <button class="btn btn-default" type="button" ng-click="search()">Search!</button>
-        </span>
-      </div> -->
       <div class="input-group search">
           <input type="text" class="form-control" placeholder="Search for..." ng-model="data.searchParam" ng-change="search()" ng-model-options="{ debounce: 500 }" />
           <span class="input-group-addon">
@@ -43,8 +37,14 @@
         </tbody>
       </table>
       <p class="bg-info info-label"><strong>Total price: {{ data.cartService.totalPrice() | currency:"&euro;" }}</strong></p>
-      <button type="button" class="btn btn-primary btn-block">Checkout</button>
-      <button ng-click="data.cartService.clear()" type="button" class="btn btn-danger btn-block">Clear</button>
+      <div class="btn-group btn-group-justified" role="group">
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-primary " ng-click="go('/checkout')">Checkout</button>
+          </div>
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-danger" ng-click="data.cartService.clear()">Clear</button>
+          </div>
+      </div>
     </span>
     <span ng-hide="data.cartService.cart.length > 0">
       <p class="bg-info" style="padding: 15px;"><strong>Empty cart!</strong></p>
