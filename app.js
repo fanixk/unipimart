@@ -131,8 +131,8 @@ app.use(function(err, req, res, next) {
     msg = err.inner;
     break;
   default:
-    // code = 500;
-    // msg = { errorMsg: 'Internal Server Error' }; //default http 500
+    code = 500;
+    msg = { errorMsg: 'Internal Server Error' }; //default http 500
   }
 
   res.status(code).json(msg);
