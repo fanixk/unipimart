@@ -187,13 +187,7 @@ module.exports = {
   create: function(req, res) {
     var user = req.user,
       lineItems = req.body.cart || [],
-      address = {
-        streetName: req.body.address.streetName || '',
-        streetNum: req.body.address.streetNum || '',
-        zipcode: req.body.address.zipcode || '',
-        city: req.body.address.city || '',
-        phone: req.body.address.phone || ''
-      };
+      address = req.body.address || {};
 
     var validator = validateOrder(lineItems, address);
     
