@@ -49,11 +49,18 @@ function validateOrder(lineItems, address) {
   var errors = [],
     isValid = true;
 
+  // check id uniqueness
+  var ids = _.pluck(lineItems, 'id');
+  if(!_.isEqual(ids, _.uniq(ids))) {
+    isValid = false;
+    errors.push(INVALID_LINEITEM_ERROR);
+  }
+
   lineItems.forEach(function(item) {
     var id = item.id,
       quantity = item.quantity;
-    // TODO Check numericallity
-    if (!id || !quantity || quantity <= 0) {
+
+    if (!id || !quantity || !_.isFinite(quantity) || quantity <= 0) {
       isValid = false;
       errors.push(INVALID_LINEITEM_ERROR);
     }
@@ -109,17 +116,46 @@ function mailer(order) {
   //   if(err) console.log(err);
   // });
 
-  order.getUser().then(function(usr) {
-    console.log('User = ', usr.email);
-  });
-  console.log('Price = ', order.price);
-  order.getItems().then(function(it) {
-    it.forEach(function(item) {
-      item.getProduct().then(function(product) {
-        console.log(product.name, ' x', item.quantity);
-      });
+  
+}
+
+function buildOrderEmail(order) {
+  var emailObj = {
+    id: order.id,
+    price: order.price
+  };
+
+  return order.getUser()
+    .then(function(user) {
+      emailObj.userEmail = user.email;
+    })
+    .then(function() {
+      emailObj.cart = [];
+      
+      return LineItem.findAll({
+          where: { orderId: order.id },
+          include: [{ model: Product }]
+        })
+        .then(function(items) {
+          items.forEach(function(item) {
+            emailObj.cart.push({
+              product: item.product.name,
+              price: item.product.price,
+              quantity: item.quantity
+            });
+          });
+        });
+    })
+    .then(function() {
+      emailObj.address = {
+        streetName: order.streetName,
+        streetNum: order.streetNum,
+        zipcode: order.zipcode,
+        city: order.city,
+        phone: order.phone
+      };
+      return emailObj;
     });
-  });
 }
 
 function buildOrder(user, address) {
@@ -135,12 +171,12 @@ function buildOrder(user, address) {
 
 function buildLineItems(orderId, lineItems) {
   var rItems = [];
-  //TODO round quantity
+
   lineItems.forEach(function(item) {
     rItems.push({
       orderId: orderId,
       productId: item.id,
-      quantity: item.quantity
+      quantity: Math.round(item.quantity)
     });
   });
   return rItems;
@@ -164,7 +200,7 @@ function calcTotalPrice(lineItems) {
     var totalPrice = 0.0;
 
     products.forEach(function(product) {
-      // find quantity for each product (TODO: check uniqueness of product ids)
+      // find quantity for each product
       var quantity = _.result(_.find(lineItems, { 'productId': product.id}), 'quantity');
       if(!quantity) quantity = 0;
       //calc total price
@@ -211,11 +247,15 @@ module.exports = {
             return setOrderPrice(orderPrice, order);
           })
           .then(function() {
-            mailer(order);
+            return buildOrderEmail(order);
+          })
+          .then(function(emailObj) {
+            mailer(emailObj);
           })
           .then(function() {
             return res.json({
-              success: true
+              success: true,
+              id: order.id
             });
           })
           .catch(respondFailure);

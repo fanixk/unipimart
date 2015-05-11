@@ -22,6 +22,7 @@ angular.module('unipimart')
         address: $scope.address
       }).success(function(data) {
         $scope.data.success = data.success;
+        $scope.data.orderId = data.id;
         $scope.data.step = 4;
       });
     }
