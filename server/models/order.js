@@ -228,7 +228,7 @@ function setOrderPrice(orderPrice, order) {
 
 // cleans address fields for xss protection since they will be sent by email
 function clean(address) {
-  _.each(address, function(field, value) {
+  _.each(address, function(value, field) {
     address[field] = sanitizer.escape(value);
   });
   return address;
