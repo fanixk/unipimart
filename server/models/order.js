@@ -116,7 +116,6 @@ function mailer(order) {
   //   if(err) console.log(err);
   // });
 
-  
 }
 
 function buildOrderEmail(order) {
@@ -219,12 +218,22 @@ function setOrderPrice(orderPrice, order) {
     });
 }
 
+// cleans address fields for xss protection since they will be sent by email
+function clean(address) {
+  _.each(address, function(field, value) {
+    address[field] = sanitizer.escape(value);
+  });
+  return address;
+}
+
 module.exports = {
   create: function(req, res) {
     var user = req.user,
       lineItems = req.body.cart || [],
       address = req.body.address || {};
 
+    // escape html entities
+    address = clean(address);
     var validator = validateOrder(lineItems, address);
     
     if (!validator.isValid) {
