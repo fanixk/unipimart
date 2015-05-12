@@ -28,3 +28,5 @@ node_modules
 
 client/components/
 .idea
+
+server/config/mailer.json

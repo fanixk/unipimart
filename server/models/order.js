@@ -4,6 +4,7 @@ var _ = require('lodash'),
   sanitizer = require('sanitizer'),
   Sequelize = require('sequelize'),
   nodemailer = require('nodemailer'),
+  mailInfo = require('../config/mailer.json'),
   db = require('../config/db.js'),
   Product = require('./product').Product,
   User = require('./user').User;
@@ -97,25 +98,32 @@ function validateOrder(lineItems, address) {
   };
 }
 
-function mailer(order) {
-  // var transporter = nodemailer.createTransport({
-  //   service: 'gmail',
-  //   auth: {
-  //     user: 'unipimart@gmail.com',
-  //     pass: 'yolo'
-  //   }
-  // });
+function mailer(emailObj) {
+  var transporter = nodemailer.createTransport({
+    service: mailInfo.service,
+    auth: {
+      user: mailInfo.user,
+      pass: mailInfo.pass
+    }
+  });
+  var subject = 'Order ' + '#' + emailObj.id;
+  var text = 'Customer email = ' + emailObj.userEmail + '\n' +
+    'Customer address = ' + JSON.stringify(emailObj.address) + '\n' +
+    'Products = ' + JSON.stringify(emailObj.cart) + '\n' +
+    'Total price = ' + emailObj.price;
 
-  // transporter.sendMail({
-  //   from: 'unipimart@gmail.com',
-  //   to: 'unipimart@gmail.com',
-  //   subject: 'hello',
-  //   text: 'hello world!'
-  // }, function(err, info) {
-  //   console.log(info);
-  //   if(err) console.log(err);
-  // });
-
+  transporter.sendMail({
+    from: 'unipimart@gmail.com',
+    to: 'unipimart@gmail.com',
+    subject: subject,
+    text: text
+  }, function(err, info) {
+    if(err) {
+      console.log(err);
+      return;
+    }
+    console.log('Email sent!');
+  });
 }
 
 function buildOrderEmail(order) {
