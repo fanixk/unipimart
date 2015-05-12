@@ -45,6 +45,9 @@ var credentials = {
 
 var app = express();
 
+// Force use of https
+app.use(forceSSL);
+
 // Content Security Policy Header
 // default Content security policy is to allow content loading only from same origin
 // defaultSrc applies as a fallback to all sources not defined
@@ -82,8 +85,7 @@ app.use(helmet.hidePoweredBy());
 // It basically tells user agents to interact with it in the future only over HTTPS.
 app.use(helmet.hsts({
   maxAge: 7776000000, // 90 days
-  includeSubdomains: true,
-  force: true
+  includeSubdomains: true
 }));
 
 // Public-Key-Pins header
@@ -93,9 +95,6 @@ app.use(helmet.publicKeyPins({
   sha256s: ['f0G8go7SQgHtzd1izDOHoZTuviPL5ULXrb5/qUQ5MIA=', 'PbQ35imK386KmjPI8wtPmH04d/8ETebo7JP9JODVuys='],
   includeSubdomains: true,
 }));
-
-// Force use of https
-app.use(forceSSL);
 
 app.use(express.static(__dirname + '/client'));
 
@@ -141,12 +140,11 @@ app.use(function(err, req, res, next) {
 app.set('httpsPort', process.env.httpsPort || 8443);
 app.set('port', process.env.PORT || 8000);
 
-var server = http.createServer(app).listen(app.get('port'), function() {
-  console.log('Express server listening on port ' + server.address().port);
-});
-
 // Start the server
 var secureServer = https.createServer(credentials, app).listen(app.get('httpsPort'), function() {
   console.log('Express secure server listening on port ' + secureServer.address().port);
 });
 
+var server = http.createServer(app).listen(app.get('port'), function() {
+  console.log('Express server listening on port ' + server.address().port);
+});
