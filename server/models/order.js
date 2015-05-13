@@ -40,7 +40,7 @@ LineItem.belongsTo(Order);
 Order.hasMany(LineItem, { as: 'Items' });
 Order.belongsTo(User);
 
-function respondFailure() {
+function respondFailure(res) {
   return res.status(400).json({
     success: false
   });
@@ -106,11 +106,21 @@ function mailer(emailObj) {
       pass: mailInfo.pass
     }
   });
+  var products = '';
+  emailObj.cart.forEach(function(product) {
+    products += product.product + ' x' + product.quantity + '\n';
+  });
+
   var subject = 'Order ' + '#' + emailObj.id;
-  var text = 'Customer email = ' + emailObj.userEmail + '\n' +
-    'Customer address = ' + JSON.stringify(emailObj.address) + '\n' +
-    'Products = ' + JSON.stringify(emailObj.cart) + '\n' +
-    'Total price = ' + emailObj.price;
+  var text = 'Customer email = ' + emailObj.userEmail + '\n\n' +
+    'Customer address: \n' +
+    'Street ' + emailObj.address.streetName + '\n' +
+    'StreetNo ' + emailObj.address.streetNum + '\n' +
+    'Zipcode ' + emailObj.address.zipcode + '\n' +
+    'City ' + emailObj.address.city + '\n' +
+    'Phone ' + emailObj.address.phone + '\n\n' +
+    'Products: \n' + products + '\n' +
+    'Total price = ' + emailObj.price + ' euros';
 
   transporter.sendMail({
     from: 'unipimart@gmail.com',
@@ -275,9 +285,15 @@ module.exports = {
               id: order.id
             });
           })
-          .catch(respondFailure);
+          .catch(function(err) {
+            // console.log(err);
+            respondFailure(res);
+          });
       })
-      .catch(respondFailure);
+      .catch(function(err) {
+        // console.log(err);
+        respondFailure(res);
+      });
   }
 }
 

@@ -30,7 +30,7 @@ var User = db.define('user', {
   hooks: {
     // hash the password before saving it in db
     beforeCreate: function(user, options, cb) {
-      // bcrypt user pass (2^10 rounds to generate a secure 128bit salt)
+      // bcrypt user pass (2^10 rounds cost & 128bit salt)
       bcrypt.hash(user.password, 10, function(err, hash) {
         if(err) {
           cb(new Error(ACCOUNT_CREATE_ERROR));
