@@ -205,7 +205,7 @@ function priceInCents(price) {
   return Math.round(price * 100);
 }
 
-function calcTotalPrice(lineItems) {  
+function calcTotalPrice(lineItems) {
   // get productIds
   var productIds = _.pluck(lineItems, 'productId');
 
@@ -231,11 +231,13 @@ function calcTotalPrice(lineItems) {
   });
 }
 
-function setOrderPrice(order) {
-  return Order.update({price: order.price}, { where: { id: order.id } })
-    .then(function() {
-      if (!order.price || order.price <= 0)
+function setOrderPrice(orderPrice, order, t1) {
+  order.price = orderPrice;
+  return Order.update({price: orderPrice}, { where: { id: order.id }, transaction: t1 })
+    .then(function(affectedRows) {
+      if (!order.price || order.price <= 0 || affectedRows == 0) {
         throw new Error(INVALID_ORDER_PRICE);
+      }
       return order;
     });
 }
@@ -268,7 +270,6 @@ module.exports = {
 
     var unsavedOrder = buildOrder(user, address);
     var sOrder = {},
-      emailObj = {},
       commited = false;
 
     db.transaction(function(t1) {
@@ -280,10 +281,9 @@ module.exports = {
         })
         .then(calcTotalPrice)
         .then(function(orderPrice) {
-          sOrder.price = orderPrice;
-          return sOrder;
+          return setOrderPrice(orderPrice, sOrder, t1);
         })
-        .then(function(order) {
+        .then(function() {
           t1.commit();
           commited = true;
           return res.json({
@@ -297,10 +297,6 @@ module.exports = {
           console.log(err);
           respondFailure(res);
         });
-    })
-    .then(function() {
-      if(!commited) return;
-      return setOrderPrice(sOrder);
     })
     .then(function() {
       if(!commited) return;
