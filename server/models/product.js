@@ -25,10 +25,10 @@ module.exports = {
   search: function(req, res) {
     var searchParam = req.body.search || '';
 
-    if (_.isEmpty(searchParam)) {
+    if (_.isEmpty(searchParam) || searchParam.indexOf('%') > -1) {
       return res.status(400)
         .json({
-          msg: 'No search parameter found'
+          msg: 'Invalid search parameter.'
         });
     }
 
