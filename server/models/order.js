@@ -10,6 +10,7 @@ var _ = require('lodash'),
   User = require('./user').User;
 
 var INVALID_LINEITEM_ERROR = 'Invalid product or quantity.',
+    INVALID_ORDER_PRICE = 'Invalid Order Price.',
     MISSING_STREETNAME_ERROR = 'Missing Street Name.',
     MISSING_STREETNUM_ERROR = 'Missing Street Num.',
     MISSING_ZIPCODE_ERROR = 'Missing Zipcode.',
@@ -188,7 +189,6 @@ function buildOrder(user, address) {
 
 function buildLineItems(orderId, lineItems) {
   var rItems = [];
-
   lineItems.forEach(function(item) {
     rItems.push({
       orderId: orderId,
@@ -196,6 +196,7 @@ function buildLineItems(orderId, lineItems) {
       quantity: Math.round(item.quantity)
     });
   });
+
   return rItems;
 }
 
@@ -204,34 +205,37 @@ function priceInCents(price) {
   return Math.round(price * 100);
 }
 
-function calcTotalPrice(lineItems) {
+function calcTotalPrice(lineItems) {  
   // get productIds
   var productIds = _.pluck(lineItems, 'productId');
 
-  return Product.findAll({
+  return Product.findAndCount({
     where: {
       id: productIds
     }
   })
   .then(function(products) {
+    if(products.count !== productIds.length) {
+      throw new Error(INVALID_LINEITEM_ERROR);
+    }
     var totalPrice = 0.0;
 
-    products.forEach(function(product) {
+    products.rows.forEach(function(product) {
       // find quantity for each product
       var quantity = _.result(_.find(lineItems, { 'productId': product.id}), 'quantity');
       if(!quantity) quantity = 0;
       //calc total price
       totalPrice += priceInCents(product.price) * quantity;
     });
-
     return totalPrice / 100;
   });
 }
 
-function setOrderPrice(orderPrice, order) {
-  order.price = orderPrice;
-  return Order.update({price: orderPrice}, { where: { id: order.id } })
+function setOrderPrice(order) {
+  return Order.update({price: order.price}, { where: { id: order.id } })
     .then(function() {
+      if (!order.price || order.price <= 0)
+        throw new Error(INVALID_ORDER_PRICE);
       return order;
     });
 }
@@ -263,37 +267,49 @@ module.exports = {
     }
 
     var unsavedOrder = buildOrder(user, address);
-    
-    Order.create(unsavedOrder)
-      .then(function(order) {
-        var bLineItems = buildLineItems(order.id, lineItems);
+    var sOrder = {},
+      emailObj = {},
+      commited = false;
 
-        LineItem.bulkCreate(bLineItems)
-          .then(calcTotalPrice)
-          .then(function(orderPrice) {
-            return setOrderPrice(orderPrice, order);
-          })
-          .then(function() {
-            return buildOrderEmail(order);
-          })
-          .then(function(emailObj) {
-            mailer(emailObj);
-          })
-          .then(function() {
-            return res.json({
-              success: true,
-              id: order.id
-            });
-          })
-          .catch(function(err) {
-            // console.log(err);
-            respondFailure(res);
+    db.transaction(function(t1) {
+      return Order.create(unsavedOrder, { transaction: t1 })
+        .then(function(order) {
+          var bLineItems = buildLineItems(order.id, lineItems);
+          sOrder = order;
+          return LineItem.bulkCreate(bLineItems, { transaction: t1 });
+        })
+        .then(calcTotalPrice)
+        .then(function(orderPrice) {
+          sOrder.price = orderPrice;
+          return sOrder;
+        })
+        .then(function(order) {
+          t1.commit();
+          commited = true;
+          return res.json({
+            success: true,
+            id: sOrder.id
           });
-      })
-      .catch(function(err) {
-        // console.log(err);
-        respondFailure(res);
-      });
+        })
+        .catch(function(err) {
+          t1.rollback();
+          commited = false;
+          console.log(err);
+          respondFailure(res);
+        });
+    })
+    .then(function() {
+      if(!commited) return;
+      return setOrderPrice(sOrder);
+    })
+    .then(function() {
+      if(!commited) return;
+      return buildOrderEmail(sOrder);
+    })
+    .then(function(emailObj) {
+      if (!commited || !emailObj) return;
+      mailer(emailObj);
+    });
   }
 }
 
